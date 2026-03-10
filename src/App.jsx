@@ -24,6 +24,10 @@ export default function App() {
   const [sC, setSC] = useState({ w: 0, h: 0 });
   const [sS, setSS] = useState({ w: 0, h: 0 });
   const [ready, setReady] = useState(false);
+  
+  // NEW: State for the mobile menu
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
   const chanderRef = useRef(null);
   const shekharRef = useRef(null);
   const [activeSection, setActiveSection] = useState("");
@@ -71,6 +75,7 @@ export default function App() {
   }, []);
 
   // --- THE PHYSICS ENGINE ---
+  const isMobile = win.w < 900;
   const rawHero = clamp(scrollY / SCROLL_DIST, 0, 1);
   const tHero = easeOut(rawHero);
 
@@ -84,22 +89,20 @@ export default function App() {
   const LINE_GAP = 4;
   const totalH = sC.h + LINE_GAP + sS.h;
 
-  // POS 0: HERO
   const x0_C = win.w / 2 - sC.w / 2, y0_C = win.h / 2 - totalH / 2;
   const x0_S = win.w / 2 - sS.w / 2, y0_S = win.h / 2 - totalH / 2 + sC.h + LINE_GAP;
 
-  // POS 1: NAVBAR
   const navY = NAVBAR_H / 2 - TARGET_H / 2;
-  const x1_C = NAV_LEFT, y1_C = navY;
-  const x1_S = NAV_LEFT + sC.w * scaleC + 9, y1_S = navY;
+  const mobileNavLeft = 24;
+  const x1_C = isMobile ? mobileNavLeft : NAV_LEFT, y1_C = navY;
+  const x1_S = (isMobile ? mobileNavLeft : NAV_LEFT) + sC.w * scaleC + 9, y1_S = navY;
 
-  // POS 2: CONTACT PAGE (Fixed the alignment to match a central 1200px container)
-  const containerEdge = win.w > 1344 ? (win.w - 1200) / 2 : 72; // 1344 = 1200 + (72 padding * 2)
-  const CONTACT_LEFT = containerEdge; 
-  const contactScale = win.w > 900 ? 0.75 : 0.45; // Slightly reduced scale so it doesn't overpower the screen
+  const containerEdge = win.w > 1344 ? (win.w - 1200) / 2 : (isMobile ? 24 : 72); 
+  const contactScale = isMobile ? 0.60 : 0.75; 
 
-  const x2_C = CONTACT_LEFT, y2_C = win.h / 2 - (totalH * contactScale) / 2;
-  const x2_S = CONTACT_LEFT, y2_S = y2_C + (sC.h * contactScale) + (LINE_GAP * contactScale);
+  const x2_C = containerEdge;
+  const y2_C = isMobile ? 120 : win.h / 2 - (totalH * contactScale) / 2;
+  const x2_S = containerEdge, y2_S = y2_C + (sC.h * contactScale) + (LINE_GAP * contactScale);
 
   let cX, cY, cScale, sX, sY, sScale, masterNavOpacity;
 
@@ -114,7 +117,7 @@ export default function App() {
   }
 
   const heroUIOpacity = clamp(1 - rawHero / 0.28, 0, 1);
-  const FONT = "clamp(44px,8.5vw,120px)";
+  const FONT = "clamp(32px, 11vw, 120px)"; 
 
   const wS = (x, y, sc) => ({
     position: "fixed", top: 0, left: 0, zIndex: 100, transformOrigin: "top left",
@@ -123,13 +126,25 @@ export default function App() {
     lineHeight: 1, whiteSpace: "nowrap"
   });
 
-  const scrollTo = id => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  // FIXED: The Javascript Scroll Engine. It physically calculates the padding so CSS can't break it.
+  const scrollTo = id => {
+    const el = document.getElementById(id);
+    if (el) {
+      const offset = 100; // Leaves 100px of breathing room above the section
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = el.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+    }
+    setIsMenuOpen(false); // Auto-closes the mobile menu
+  };
 
   return (
     <div style={{ background: "#0a0a12", color: "#EAEAEA", fontFamily: "'Helvetica Neue',Arial,sans-serif", overflowX: "hidden", position: "relative" }}>
       <Atmosphere />
 
-      {/* NAVBAR */}
+      {/* NAVBAR BACKGROUND */}
       <div style={{
         position: "fixed", top: 0, left: 0, right: 0, height: NAVBAR_H, zIndex: 90, pointerEvents: "none",
         background: `rgba(10,10,18,${masterNavOpacity * 0.85})`,
@@ -138,23 +153,77 @@ export default function App() {
         opacity: masterNavOpacity 
       }} />
 
-      <div style={{ position: "fixed", top: 0, right: 28, height: NAVBAR_H, display: "flex", alignItems: "center", zIndex: 100, opacity: masterNavOpacity, transition: "opacity 0.1s", pointerEvents: masterNavOpacity > 0.5 ? "auto" : "none" }}>
-        {NAV_LINKS.map(lnk => {
-          const id = lnk.toLowerCase(), active = activeSection === id;
-          return (
-            <button key={lnk} onClick={() => scrollTo(id)}
-              style={{
-                background: "none", border: "none", cursor: "pointer", padding: "0 12px", height: NAVBAR_H,
-                display: "flex", alignItems: "center", fontSize: 10, fontWeight: 700, letterSpacing: "0.2em",
-                textTransform: "uppercase", color: active ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)",
-                borderBottom: active ? "1px solid rgba(255,255,255,0.6)" : "1px solid transparent",
-                transition: "all 0.3s"
-              }}>
-              {lnk}
-            </button>
-          );
-        })}
-      </div>
+      {/* DESKTOP NAV */}
+      {!isMobile && (
+        <div style={{ position: "fixed", top: 0, right: 28, height: NAVBAR_H, display: "flex", alignItems: "center", zIndex: 100, opacity: masterNavOpacity, transition: "opacity 0.1s", pointerEvents: masterNavOpacity > 0.5 ? "auto" : "none" }}>
+          {NAV_LINKS.map(lnk => {
+            const id = lnk.toLowerCase(), active = activeSection === id;
+            return (
+              <button key={lnk} onClick={() => scrollTo(id)}
+                style={{
+                  background: "none", border: "none", cursor: "pointer", padding: "0 12px", height: NAVBAR_H,
+                  display: "flex", alignItems: "center", fontSize: 10, fontWeight: 700, letterSpacing: "0.2em",
+                  textTransform: "uppercase", color: active ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)",
+                  borderBottom: active ? "1px solid rgba(255,255,255,0.6)" : "1px solid transparent",
+                  transition: "all 0.3s"
+                }}>
+                {lnk}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* MOBILE 3-LINE MENU BUTTON */}
+      {isMobile && (
+        <button 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          style={{ 
+            position: "fixed", top: 12, right: 24, zIndex: 110, width: 40, height: 40, 
+            background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", 
+            borderRadius: "50%", display: "flex", flexDirection: "column", justifyContent: "center", 
+            alignItems: "center", gap: 4, cursor: "pointer", opacity: masterNavOpacity > 0.5 || isMenuOpen ? 1 : 0, 
+            pointerEvents: masterNavOpacity > 0.5 || isMenuOpen ? "auto" : "none",
+            backdropFilter: "blur(12px)", transition: "opacity 0.3s"
+          }}
+        >
+          {/* Animated Hamburger Lines */}
+          <span style={{ width: 14, height: 1.5, background: "#fff", transition: "all 0.3s cubic-bezier(0.23, 1, 0.32, 1)", transform: isMenuOpen ? "rotate(45deg) translate(4px, 4px)" : "translateY(0)" }} />
+          <span style={{ width: 14, height: 1.5, background: "#fff", transition: "all 0.3s", opacity: isMenuOpen ? 0 : 1 }} />
+          <span style={{ width: 14, height: 1.5, background: "#fff", transition: "all 0.3s cubic-bezier(0.23, 1, 0.32, 1)", transform: isMenuOpen ? "rotate(-45deg) translate(4px, -4px)" : "translateY(0)" }} />
+        </button>
+      )}
+
+      {/* FULL SCREEN MOBILE MENU OVERLAY */}
+      {isMobile && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, width: "100%", height: "100vh", zIndex: 105,
+          background: "rgba(10,10,15,0.95)", backdropFilter: "blur(24px)",
+          display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 32,
+          transition: "all 0.5s cubic-bezier(0.23, 1, 0.32, 1)",
+          opacity: isMenuOpen ? 1 : 0, pointerEvents: isMenuOpen ? "auto" : "none",
+          transform: isMenuOpen ? "translateY(0)" : "translateY(-20px)"
+        }}>
+          {NAV_LINKS.map((lnk, i) => {
+            const id = lnk.toLowerCase(), active = activeSection === id;
+            return (
+              <button 
+                key={lnk} 
+                onClick={() => scrollTo(id)}
+                style={{ 
+                  background: "none", border: "none", fontSize: 24, fontFamily: "'Helvetica Neue',Arial,sans-serif", 
+                  fontWeight: 300, letterSpacing: "0.2em", textTransform: "uppercase", 
+                  color: active ? "#fff" : "rgba(255,255,255,0.4)", cursor: "pointer",
+                  transform: isMenuOpen ? "translateY(0)" : "translateY(20px)",
+                  transition: `all 0.5s cubic-bezier(0.23, 1, 0.32, 1) ${i * 0.05}s`
+                }}
+              >
+                {lnk}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* THE MAGIC STICKY NAME */}
       <div ref={chanderRef} style={wS(cX, cY, cScale)}>
@@ -166,7 +235,7 @@ export default function App() {
 
       {/* HERO SECTION */}
       <div style={{ height: "100vh", position: "relative", zIndex: 1 }}>
-        <div style={{ position: "absolute", bottom: 40, right: 40, display: "flex", alignItems: "center", gap: 16, opacity: heroUIOpacity }}>
+        <div className="hero-explore" style={{ position: "absolute", bottom: 40, right: 40, display: "flex", alignItems: "center", gap: 16, opacity: heroUIOpacity }}>
           <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.25em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>About Me</span>
           <button onClick={() => scrollTo("about")} style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", justifyContent: "center", alignItems: "center", cursor: "pointer", color: "#fff", transition: "all 0.3s" }} onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.03)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="7" x2="17" y2="17" /><polyline points="17 7 17 17 7 17" /></svg>
@@ -191,6 +260,10 @@ export default function App() {
         ::selection { background: rgba(99,102,241,0.5); color: #fff; }
         button { font-family: inherit; }
         a { color: inherit; }
+
+        @media (max-width: 900px) {
+          .hero-explore { left: 24px !important; bottom: 32px !important; }
+        }
       `}</style>
     </div>
   );

@@ -166,8 +166,8 @@ export default function App() {
 
       {/* HERO SECTION */}
       <div style={{ height: "100vh", position: "relative", zIndex: 1 }}>
-        <div style={{ position: "absolute", bottom: 40, left: 40, display: "flex", alignItems: "center", gap: 16, opacity: heroUIOpacity }}>
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.25em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>Explore</span>
+        <div style={{ position: "absolute", bottom: 40, right: 40, display: "flex", alignItems: "center", gap: 16, opacity: heroUIOpacity }}>
+          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.25em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>About Me</span>
           <button onClick={() => scrollTo("about")} style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", justifyContent: "center", alignItems: "center", cursor: "pointer", color: "#fff", transition: "all 0.3s" }} onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.03)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="7" x2="17" y2="17" /><polyline points="17 7 17 17 7 17" /></svg>
           </button>

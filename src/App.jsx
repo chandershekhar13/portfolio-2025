@@ -24,21 +24,30 @@ export default function App() {
   const [sC, setSC] = useState({ w: 0, h: 0 });
   const [sS, setSS] = useState({ w: 0, h: 0 });
   const [ready, setReady] = useState(false);
-  
-  // NEW: State for the mobile menu
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const chanderRef = useRef(null);
   const shekharRef = useRef(null);
+  const prevW = useRef(0); // Memory bank to prevent mobile address bar glitches
   const [activeSection, setActiveSection] = useState("");
 
   const measure = useCallback(() => {
     if (!chanderRef.current || !shekharRef.current) return;
-    [chanderRef.current, shekharRef.current].forEach(el => { el.style.transform = "none"; el.style.opacity = "0"; });
-    const rc = chanderRef.current.getBoundingClientRect();
-    const rs = shekharRef.current.getBoundingClientRect();
-    setSC({ w: rc.width, h: rc.height }); setSS({ w: rs.width, h: rs.height });
-    setWin({ w: window.innerWidth, h: window.innerHeight }); setReady(true);
+    
+    // FIXED: Only re-measure DOM elements if the screen WIDTH changes (device rotation).
+    // This stops the name from vanishing when mobile address bars hide on scroll!
+    if (window.innerWidth !== prevW.current) {
+      prevW.current = window.innerWidth;
+      [chanderRef.current, shekharRef.current].forEach(el => { el.style.transform = "none"; el.style.opacity = "0"; });
+      const rc = chanderRef.current.getBoundingClientRect();
+      const rs = shekharRef.current.getBoundingClientRect();
+      setSC({ w: rc.width, h: rc.height }); 
+      setSS({ w: rs.width, h: rs.height });
+      setReady(true);
+    }
+    
+    // Always update window dimensions so math stays accurate
+    setWin({ w: window.innerWidth, h: window.innerHeight }); 
   }, []);
 
   useEffect(() => {
@@ -126,18 +135,17 @@ export default function App() {
     lineHeight: 1, whiteSpace: "nowrap"
   });
 
-  // FIXED: The Javascript Scroll Engine. It physically calculates the padding so CSS can't break it.
   const scrollTo = id => {
     const el = document.getElementById(id);
     if (el) {
-      const offset = 100; // Leaves 100px of breathing room above the section
+      const offset = 100; 
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = el.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
       const offsetPosition = elementPosition - offset;
       window.scrollTo({ top: offsetPosition, behavior: "smooth" });
     }
-    setIsMenuOpen(false); // Auto-closes the mobile menu
+    setIsMenuOpen(false); 
   };
 
   return (
@@ -187,7 +195,6 @@ export default function App() {
             backdropFilter: "blur(12px)", transition: "opacity 0.3s"
           }}
         >
-          {/* Animated Hamburger Lines */}
           <span style={{ width: 14, height: 1.5, background: "#fff", transition: "all 0.3s cubic-bezier(0.23, 1, 0.32, 1)", transform: isMenuOpen ? "rotate(45deg) translate(4px, 4px)" : "translateY(0)" }} />
           <span style={{ width: 14, height: 1.5, background: "#fff", transition: "all 0.3s", opacity: isMenuOpen ? 0 : 1 }} />
           <span style={{ width: 14, height: 1.5, background: "#fff", transition: "all 0.3s cubic-bezier(0.23, 1, 0.32, 1)", transform: isMenuOpen ? "rotate(-45deg) translate(4px, -4px)" : "translateY(0)" }} />
@@ -235,8 +242,8 @@ export default function App() {
 
       {/* HERO SECTION */}
       <div style={{ height: "100vh", position: "relative", zIndex: 1 }}>
-        <div className="hero-explore" style={{ position: "absolute", bottom: 40, right: 40, display: "flex", alignItems: "center", gap: 16, opacity: heroUIOpacity }}>
-          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.25em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>About Me</span>
+        <div className="hero-explore" style={{ position: "absolute", bottom: 40, left: 40, display: "flex", alignItems: "center", gap: 16, opacity: heroUIOpacity }}>
+          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.25em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>Explore</span>
           <button onClick={() => scrollTo("about")} style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", justifyContent: "center", alignItems: "center", cursor: "pointer", color: "#fff", transition: "all 0.3s" }} onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.03)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="7" x2="17" y2="17" /><polyline points="17 7 17 17 7 17" /></svg>
           </button>
@@ -260,6 +267,8 @@ export default function App() {
         ::selection { background: rgba(99,102,241,0.5); color: #fff; }
         button { font-family: inherit; }
         a { color: inherit; }
+
+        section[id] { scroll-margin-top: 80px; }
 
         @media (max-width: 900px) {
           .hero-explore { left: 24px !important; bottom: 32px !important; }

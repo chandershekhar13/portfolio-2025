@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Glass, SL, useReveal } from "./Shared";
 import { Box, Coffee, Code2, Database, Terminal, Atom, Award, Maximize2, X, Trophy } from "lucide-react";
+
+// Make sure your image imports are correct based on your setup
 import sqlCert from "../assets/certificates/sql.jpg";
 import dsaCert from "../assets/certificates/dsa.jpg";
 import nptelCert from "../assets/certificates/nptel.jpg";
@@ -16,7 +18,7 @@ const HR_BADGES = [
   { name: "React", stars: 5, Icon: Atom, bg: "#ffd24d" }
 ];
 
-// Certificate Data (These paths point exactly to public/certificates/...)
+// Certificate Data 
 const CERTIFICATE_DATA = [
   { 
     name: "SQL (Intermediate)", org: "HackerRank", date: "Oct 2025", 
@@ -32,8 +34,7 @@ const CERTIFICATE_DATA = [
   }
 ];
 
-// Custom SVG HackerRank Hexagon
-// Custom SVG HackerRank Hexagon
+// Custom SVG HackerRank Hexagon - NOW FULLY RESPONSIVE!
 function HexBadge({ name, stars, Icon, bg }) {
   const [isHovered, setIsHovered] = useState(false);
   
@@ -41,11 +42,12 @@ function HexBadge({ name, stars, Icon, bg }) {
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      className="hex-badge-container"
       style={{
-        position: 'relative', width: 140, height: 160,
+        position: 'relative', 
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         filter: isHovered ? 'drop-shadow(0px 20px 30px rgba(0,0,0,0.6))' : 'drop-shadow(0px 10px 20px rgba(0,0,0,0.3))',
-        transform: isHovered ? 'translateY(-12px)' : 'none',
+        transform: isHovered ? 'translateY(-8px)' : 'none',
         transition: 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
         cursor: 'default'
       }}
@@ -55,17 +57,16 @@ function HexBadge({ name, stars, Icon, bg }) {
         <polygon points="50,8 92,33 92,82 50,107 8,82 8,33" fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth="2" />
       </svg>
       
-      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-        <Icon size={32} color="#2a323c" strokeWidth={1.5} />
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(4px, 1vw, 8px)' }}>
+        <Icon className="hex-icon" color="#2a323c" strokeWidth={1.5} />
         
-        <span style={{ fontSize: 10, fontWeight: 800, color: '#2a323c', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'center', maxWidth: 110, lineHeight: 1.2 }}>
+        <span style={{ fontSize: 'clamp(8px, 2vw, 10px)', fontWeight: 800, color: '#2a323c', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'center', maxWidth: '85%', lineHeight: 1.2 }}>
           {name}
         </span>
         
-        {/* ONLY renders the earned stars, perfectly centered */}
-        <div style={{ display: 'flex', gap: 3, marginTop: 2, justifyContent: 'center', width: '100%' }}>
+        <div style={{ display: 'flex', gap: 2, marginTop: 2, justifyContent: 'center', width: '100%' }}>
           {Array.from({ length: stars }).map((_, i) => (
-            <svg key={i} width="10" height="10" viewBox="0 0 24 24" fill="#2a323c">
+            <svg key={i} className="hex-star" viewBox="0 0 24 24" fill="#2a323c">
               <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
             </svg>
           ))}
@@ -89,18 +90,45 @@ export default function Achievements() {
   }, [activeCert]);
 
   return (
-    <section id="achievements" style={{ position: "relative", zIndex: 1, padding: "100px 72px" }}>
+    // FIXED: Global Padding updated to shrink gracefully on Mobile!
+    <section id="achievements" style={{ position: "relative", zIndex: 1, padding: "clamp(80px, 10vw, 120px) clamp(24px, 5vw, 72px)" }}>
+      
+      {/* ADDED: Dynamic CSS rules to handle the 3x2 Hex Grid and scaling */}
+      <style>{`
+        /* Mobile: 3 Columns x 2 Rows */
+        .badges-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+          justify-items: center;
+        }
+        
+        /* Hexagon fluid scaling logic */
+        .hex-badge-container { width: clamp(90px, 28vw, 140px); height: clamp(103px, 32vw, 160px); }
+        .hex-icon { width: clamp(20px, 6vw, 32px); height: clamp(20px, 6vw, 32px); }
+        .hex-star { width: clamp(6px, 1.5vw, 10px); height: clamp(6px, 1.5vw, 10px); }
+
+        /* Desktop: 6 Columns x 1 Row */
+        @media (min-width: 900px) {
+          .badges-grid {
+            grid-template-columns: repeat(6, 1fr);
+            gap: 24px;
+          }
+        }
+      `}</style>
+
       <div style={{ maxWidth: 1300, margin: "0 auto" }}>
         <SL num="04" label="Achievements & Certifications" />
         
-        <div style={{ display: "flex", flexDirection: "column", gap: 80 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "clamp(48px, 8vw, 80px)" }}>
           
           {/* 1. Crown Jewel: Adobe Hackathon */}
           <div ref={r0} style={s0}>
             <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>
               Notable Distinction
             </p>
-            <Glass r={24} style={{ padding: "48px 56px", background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(220, 38, 38, 0.08) 100%)", border: "1px solid rgba(255,255,255,0.08)" }}>
+            {/* FIXED: Glass padding made responsive to prevent mobile overflow */}
+            <Glass r={24} style={{ padding: "clamp(24px, 5vw, 48px) clamp(24px, 5vw, 56px)", background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(220, 38, 38, 0.08) 100%)", border: "1px solid rgba(255,255,255,0.08)" }}>
               <div style={{ display: "flex", gap: 32, alignItems: "center", flexWrap: "wrap" }}>
                 <div style={{ background: "rgba(220, 38, 38, 0.15)", padding: "20px", borderRadius: "50%", border: "1px solid rgba(220, 38, 38, 0.3)" }}>
                   <Trophy size={40} color="#fca5a5" strokeWidth={1.5} />
@@ -129,7 +157,8 @@ export default function Achievements() {
               <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", letterSpacing: "0.05em" }}>Verified algorithmic competency.</p>
             </div>
             
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 24 }}>
+            {/* FIXED: Uses the new CSS Grid structure */}
+            <div className="badges-grid">
               {HR_BADGES.map((badge, i) => (
                 <HexBadge key={i} {...badge} />
               ))}
@@ -144,7 +173,8 @@ export default function Achievements() {
               Verified Certificates (Click to view)
             </p>
             
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
+            {/* FIXED: minmax adjusted from 300px to 250px so it fits smaller iPhone screens perfectly */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 16 }}>
               {CERTIFICATE_DATA.map((c, i) => (
                 <Glass key={i} r={20} hover style={{ padding: "32px", cursor: "zoom-in", background: `linear-gradient(135deg,rgba(255,255,255,0.04) 0%,${c.accent} 100%)`, display: "flex", flexDirection: "column", justifyContent: "space-between" }} 
                   onClick={() => setActiveCert(c.img)}
@@ -206,7 +236,7 @@ export default function Achievements() {
               }}
               onError={(e) => {
                 e.target.style.display = "none";
-                e.target.insertAdjacentHTML('afterend', '<div style="color: white; font-family: sans-serif; text-align: center; padding: 40px; background: rgba(255,255,255,0.05); border-radius: 16px;"><h2>Image Not Found</h2><p style="color: rgba(255,255,255,0.5);">Please ensure your JPG files are inside the <strong>public/certificates/</strong> folder.</p></div>');
+                e.target.insertAdjacentHTML('afterend', '<div style="color: white; font-family: sans-serif; text-align: center; padding: 40px; background: rgba(255,255,255,0.05); border-radius: 16px;"><h2>Image Not Found</h2><p style="color: rgba(255,255,255,0.5);">Please ensure your paths are correct.</p></div>');
               }}
             />
           </motion.div>

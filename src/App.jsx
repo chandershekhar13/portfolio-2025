@@ -271,7 +271,7 @@ export default function App() {
         section[id] { scroll-margin-top: 80px; }
 
         @media (max-width: 900px) {
-          .hero-explore { left: 24px !important; bottom: 32px !important; }
+          .hero-explore { right: 24px !important; bottom: 32px !important; }
         }
       `}</style>
     </div>

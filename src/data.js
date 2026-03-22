@@ -3,7 +3,7 @@
 export const NAV_LINKS = ["About","Projects","Skills","Achievements","Education","Contact"];
 
 export const PROJECTS = [
-  { num:"01", name:"Hierarch-Engine", context:"Adobe Hackathon 2025 — Round 3",
+  { num:"01", name:"Hierarch-Engine", github: "https://github.com/chandershekhar13/Hierarch-Engine",context:"Adobe Hackathon 2025 — Round 3",
     period:"Jun '25 – Jul '25", tag:"PDF Structure Extraction",
     tech:["Python","PyMuPDF","Docker","Algorithmic Logic"],
     accent:"rgba(99,102,241,0.18)",
@@ -15,7 +15,7 @@ export const PROJECTS = [
       "Dockerised for fully reproducible cross-platform execution in hackathon-restricted environments.",
     ],
   },
-  { num:"02", name:"Algo Visualizer", context:"Personal Project — Web Architecture",
+  { num:"02", name:"Algo Visualizer", github: "https://github.com/chandershekhar13/algoverse",link:"https://algoverse-vert.vercel.app/", context:"Personal Project — Web Architecture",
     period:"Nov '24 – Dec '24", tag:"React · DSA Algorithms",
     tech:["React","JavaScript","HTML/CSS","State Management"],
     accent:"rgba(16,185,129,0.14)",

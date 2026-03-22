@@ -34,7 +34,7 @@ const CERTIFICATE_DATA = [
   }
 ];
 
-// Custom SVG HackerRank Hexagon - NOW FULLY RESPONSIVE!
+// Custom SVG HackerRank Hexagon
 function HexBadge({ name, stars, Icon, bg }) {
   const [isHovered, setIsHovered] = useState(false);
   
@@ -90,10 +90,9 @@ export default function Achievements() {
   }, [activeCert]);
 
   return (
-    // FIXED: Global Padding updated to shrink gracefully on Mobile!
-    <section id="achievements" style={{ position: "relative", zIndex: 1, padding: "clamp(80px, 10vw, 120px) clamp(24px, 5vw, 72px)" }}>
+    // FIXED: Dynamically boosts the zIndex so it completely overrides the Navbar when a cert is open!
+    <section id="achievements" style={{ position: "relative", zIndex: activeCert ? 999999 : 1, padding: "clamp(80px, 10vw, 120px) clamp(24px, 5vw, 72px)" }}>
       
-      {/* ADDED: Dynamic CSS rules to handle the 3x2 Hex Grid and scaling */}
       <style>{`
         /* Mobile: 3 Columns x 2 Rows */
         .badges-grid {
@@ -127,7 +126,6 @@ export default function Achievements() {
             <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>
               Notable Distinction
             </p>
-            {/* FIXED: Glass padding made responsive to prevent mobile overflow */}
             <Glass r={24} style={{ padding: "clamp(24px, 5vw, 48px) clamp(24px, 5vw, 56px)", background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(220, 38, 38, 0.08) 100%)", border: "1px solid rgba(255,255,255,0.08)" }}>
               <div style={{ display: "flex", gap: 32, alignItems: "center", flexWrap: "wrap" }}>
                 <div style={{ background: "rgba(220, 38, 38, 0.15)", padding: "20px", borderRadius: "50%", border: "1px solid rgba(220, 38, 38, 0.3)" }}>
@@ -157,7 +155,6 @@ export default function Achievements() {
               <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", letterSpacing: "0.05em" }}>Verified algorithmic competency.</p>
             </div>
             
-            {/* FIXED: Uses the new CSS Grid structure */}
             <div className="badges-grid">
               {HR_BADGES.map((badge, i) => (
                 <HexBadge key={i} {...badge} />
@@ -173,7 +170,6 @@ export default function Achievements() {
               Verified Certificates (Click to view)
             </p>
             
-            {/* FIXED: minmax adjusted from 300px to 250px so it fits smaller iPhone screens perfectly */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 16 }}>
               {CERTIFICATE_DATA.map((c, i) => (
                 <Glass key={i} r={20} hover style={{ padding: "32px", cursor: "zoom-in", background: `linear-gradient(135deg,rgba(255,255,255,0.04) 0%,${c.accent} 100%)`, display: "flex", flexDirection: "column", justifyContent: "space-between" }} 
@@ -205,8 +201,9 @@ export default function Achievements() {
             transition={{ duration: 0.3 }}
             onClick={() => setActiveCert(null)}
             style={{
-              position: "fixed", inset: 0, zIndex: 99999,
-              background: "rgba(5,5,8,0.95)", backdropFilter: "blur(20px)",
+              position: "fixed", inset: 0, zIndex: 999999,
+              // FIXED: Swapped to a pure, solid dark background so absolutely nothing bleeds through
+              background: "#050508", 
               display: "flex", justifyContent: "center", alignItems: "center",
               cursor: "zoom-out"
             }}
